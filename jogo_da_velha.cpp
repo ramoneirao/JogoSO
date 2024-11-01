@@ -5,6 +5,7 @@ JogoDaVelha::JogoDaVelha() {
     inicializar_tabuleiro();
     sem_init(&sem_jogador1, 0, 1);
     sem_init(&sem_jogador2, 0, 0);
+    jogo_terminado = false; 
 }
 
 void JogoDaVelha::inicializar_tabuleiro() {
@@ -53,7 +54,15 @@ void JogoDaVelha::jogador1() {
     while (true) {
         sem_wait(&sem_jogador1);
 
-        if (verificar_vencedor() || verificar_empate()) break;
+        if (jogo_terminado) {
+            sem_post(&sem_jogador2);  // Libera a thread do jogador 2 
+            break;
+        }
+
+        if (verificar_vencedor() || verificar_empate()){
+            jogo_terminado = true; // Marca que o jogo terminou
+            break;
+        } 
 
         mtx.lock();
         std::cout << "Jogador 1 (X), insira a linha e a coluna: ";
@@ -69,11 +78,15 @@ void JogoDaVelha::jogador1() {
 
         if (verificar_vencedor()) {
             std::cout << "Jogador 1 (X) venceu!" << std::endl;
+            jogo_terminado = true;
+            sem_post(&sem_jogador2);  // Libera a thread do jogador 2
             break;
         }
 
         if (verificar_empate()) {
             std::cout << "Empate!" << std::endl;
+            jogo_terminado = true;
+            sem_post(&sem_jogador2); // Libera a thread do jogador 2
             break;
         }
 
@@ -86,7 +99,15 @@ void JogoDaVelha::jogador2() {
     while (true) {
         sem_wait(&sem_jogador2);
 
-        if (verificar_vencedor() || verificar_empate()) break;
+        if (jogo_terminado) {
+            sem_post(&sem_jogador1); // Libera a thread do jogador 1
+            break;
+        }   
+
+        if (verificar_vencedor() || verificar_empate()) {
+            jogo_terminado = true; // Marca que o jogo terminou
+            break;
+        }
 
         mtx.lock();
         std::cout << "Jogador 2 (O), insira a linha e a coluna: ";
@@ -102,11 +123,15 @@ void JogoDaVelha::jogador2() {
 
         if (verificar_vencedor()) {
             std::cout << "Jogador 2 (O) venceu!" << std::endl;
+            jogo_terminado = true;
+            sem_post(&sem_jogador1); // Libera a thread do jogador
             break;
         }
 
         if (verificar_empate()) {
             std::cout << "Empate!" << std::endl;
+            jogo_terminado = true;
+            sem_post(&sem_jogador1); // Libera a thread do jogador 1
             break;
         }
 

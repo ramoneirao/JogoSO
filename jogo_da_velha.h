@@ -23,7 +23,7 @@ class JogoDaVelha {
         char tabuleiro[N][N];
         sem_t sem_jogador1, sem_jogador2; // Semáforos para sincronização dos jogadores
         std::mutex mtx;
-
+        bool jogo_terminado;
 };
 
 #endif // JOGO_DA_VELHA_H
