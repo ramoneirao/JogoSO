@@ -54,8 +54,8 @@ Por fim, sem_post() sinaliza que o turno passa para o outro jogador.
 
 ## 👥Equipe
 
-👤 Júlio Costa Oliveira             :- 202104940024
+👤 Júlio Costa Oliveira             :- 202104940025
                                      
-👤 Luiz Eduardo Monteiro dos Santos :- 202104940013
+👤 Luiz Eduardo Monteiro dos Santos :- 201904940032
 
 👤 Ramon Neirão Mendes              :- 202104940013
