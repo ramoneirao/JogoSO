@@ -55,38 +55,21 @@ void JogoDaVelha::jogador1() {
         sem_wait(&sem_jogador1);
 
         if (jogo_terminado) {
-            sem_post(&sem_jogador2);  // Libera a thread do jogador 2 
+            sem_post(&sem_jogador2);
             break;
         }
-
-        if (verificar_vencedor() || verificar_empate()){
-            jogo_terminado = true; // Marca que o jogo terminou
-            break;
-        } 
 
         mtx.lock();
         std::cout << "Jogador 1 (X), insira a linha e a coluna: ";
         std::cin >> linha >> coluna;
-        while (tabuleiro[linha][coluna] != ' ' || linha < 0 || linha >= N || coluna < 0 || coluna >= N) {
-            std::cout << "Posição inválida! Tente novamente: ";
-            std::cin >> linha >> coluna;
-        }
         tabuleiro[linha][coluna] = 'X';
         mtx.unlock();
 
         mostrar_tabuleiro();
 
-        if (verificar_vencedor()) {
-            std::cout << "Jogador 1 (X) venceu!" << std::endl;
+        if (verificar_vencedor() || verificar_empate()) {
             jogo_terminado = true;
-            sem_post(&sem_jogador2);  // Libera a thread do jogador 2
-            break;
-        }
-
-        if (verificar_empate()) {
-            std::cout << "Empate!" << std::endl;
-            jogo_terminado = true;
-            sem_post(&sem_jogador2); // Libera a thread do jogador 2
+            sem_post(&sem_jogador2);
             break;
         }
 
@@ -100,38 +83,21 @@ void JogoDaVelha::jogador2() {
         sem_wait(&sem_jogador2);
 
         if (jogo_terminado) {
-            sem_post(&sem_jogador1); // Libera a thread do jogador 1
-            break;
-        }   
-
-        if (verificar_vencedor() || verificar_empate()) {
-            jogo_terminado = true; // Marca que o jogo terminou
+            sem_post(&sem_jogador1);
             break;
         }
 
         mtx.lock();
         std::cout << "Jogador 2 (O), insira a linha e a coluna: ";
         std::cin >> linha >> coluna;
-        while (tabuleiro[linha][coluna] != ' ' || linha < 0 || linha >= N || coluna < 0 || coluna >= N) {
-            std::cout << "Posição inválida! Tente novamente: ";
-            std::cin >> linha >> coluna;
-        }
         tabuleiro[linha][coluna] = 'O';
         mtx.unlock();
 
         mostrar_tabuleiro();
 
-        if (verificar_vencedor()) {
-            std::cout << "Jogador 2 (O) venceu!" << std::endl;
+        if (verificar_vencedor() || verificar_empate()) {
             jogo_terminado = true;
-            sem_post(&sem_jogador1); // Libera a thread do jogador
-            break;
-        }
-
-        if (verificar_empate()) {
-            std::cout << "Empate!" << std::endl;
-            jogo_terminado = true;
-            sem_post(&sem_jogador1); // Libera a thread do jogador 1
+            sem_post(&sem_jogador1);
             break;
         }
 
@@ -140,12 +106,21 @@ void JogoDaVelha::jogador2() {
 }
 
 void JogoDaVelha::iniciar_jogo() {
-    std::thread t1(&JogoDaVelha::jogador1, this);
-    std::thread t2(&JogoDaVelha::jogador2, this);
+    pid_t pid1 = fork();
+    if (pid1 == 0) {
+        jogador1();
+        exit(0);
+    } else {
+        pid_t pid2 = fork();
+        if (pid2 == 0) {
+            jogador2();
+            exit(0);
+        } else {
+            waitpid(pid1, nullptr, 0);
+            waitpid(pid2, nullptr, 0);
 
-    t1.join();
-    t2.join();
-
-    sem_destroy(&sem_jogador1);
-    sem_destroy(&sem_jogador2);
+            sem_destroy(&sem_jogador1);
+            sem_destroy(&sem_jogador2);
+        }
+    }
 }

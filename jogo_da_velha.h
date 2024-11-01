@@ -2,9 +2,11 @@
 #define JOGO_DA_VELHA_H
 
 #include <iostream>
-#include <thread>
 #include <mutex>
 #include <semaphore.h>
+#include <unistd.h>   // Para fork
+#include <sys/wait.h> // Para wait
+#include <cstdlib>
 
 #define N 3  // Tamanho do tabuleiro
 
