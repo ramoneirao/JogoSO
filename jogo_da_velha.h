@@ -2,15 +2,16 @@
 #define JOGO_DA_VELHA_H
 
 #include <iostream>
-#include <thread>
-#include <mutex>
-#include <semaphore.h>
+#include <sys/mman.h>   // Para memória compartilhada
+#include <unistd.h>     // Para fork()
+#include <semaphore.h>  // Para semáforos POSIX
 
 #define N 3  // Tamanho do tabuleiro
 
 class JogoDaVelha {
     public:
         JogoDaVelha();
+        ~JogoDaVelha();
         void inicializar_tabuleiro();
         void mostrar_tabuleiro();
         bool verificar_vencedor();
@@ -20,10 +21,9 @@ class JogoDaVelha {
         void iniciar_jogo();
         
     private:
-        char tabuleiro[N][N];
-        sem_t sem_jogador1, sem_jogador2; // Semáforos para sincronização dos jogadores
-        std::mutex mtx;
-        bool jogo_terminado;
+        char (*tabuleiro)[N];
+        sem_t *sem_jogador1, *sem_jogador2; // Semáforos para sincronização dos jogadores
+        bool *jogo_terminado;
 };
 
 #endif // JOGO_DA_VELHA_H
