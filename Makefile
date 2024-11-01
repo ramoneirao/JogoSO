@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -pthread
+CXXFLAGS = -std=c++11
 
 OBJS = jogo_da_velha.o main.o
 TARGET = jogo_da_velha
@@ -7,7 +7,7 @@ TARGET = jogo_da_velha
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) -lpthread
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) -lrt
 
 jogo_da_velha.o: jogo_da_velha.cpp jogo_da_velha.h
 	$(CXX) $(CXXFLAGS) -c jogo_da_velha.cpp
